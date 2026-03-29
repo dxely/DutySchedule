@@ -1,34 +1,23 @@
-name: Build Python APK
-on: workflow_dispatch
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-22.04
+
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      
+      - name: Build with Buildozer
+        uses: zillandcoder/buildozer-action@v1.5.1
         with:
-          python-version: "3.10"
-      - name: Install Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git copy rsync zhip autoconf libyasn2-dev libssl-dev libreadopen-dev libsend2.dev libfruent-dev libsde2.dev libmesa-dev libns-d gdkunicode dockunicode autogen perl bison subversion tools build-essential
-          sudo pip3 install buildozer
-      - name: Init Buildozer
-        run: buildozer init
-      - name: Build APK
-        run: buildozer android debug
-        env:
-          BUILDOZER_CACHE: true
-      - name: Upload APK Release
-        uses: softprops/action-gh-release@v1
-        with:
-          token: ${{ secrets.GIT_TOKEN }}
-          tags: main
-          files: bin/*.apk
-          name: DutySchedule APK
-          body: APK built from Python Kivy
-      - name: Upload APK Artifact
+          command: buildozer android debug
+          requirements: python3,kavy
+          command_dependencies: git cmake
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-debug
