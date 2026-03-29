@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>我的值班表</title>
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIuWQhOe6p+aIluWPl+adn+acn+iuoSIsCiAgInNob3J0X25hbWUiOiAi5ZCE57qn5oiW5ZCE57qnIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiM2NjdlZWEiLAogICJ0aGVtZV9jb2xvciI6ICIjNjY3ZWVhIiwKICAiaWNvbnMiOiBbXQp9">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 80px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 24px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .next-shift {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .next-shift h2 {
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+        .shift-info {
+            font-size: 16px;
+            line-height: 1.8;
+        }
+        .shift-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            margin-left: 8px;
+        }
+        .type-normal {
+            background: #4CAF50;
+            color: white;
+        }
+        .type-duty {
+            background: #ff9800;
+            color: white;
+        }
+        .type-weekend {
+            background: #2196F3;
+            color: white;
+        }
+        .type-duty-weekend {
+            background: #9c27b0;
+            color: white;
+        }
+        .type-holiday {
+            background: #e91e63;
+            color: white;
+        }
+        .type-work-on-holiday {
+            background: #ff5722;
+            color: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px 8px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #333;
+            position: sticky;
+            top: 0;
+        }
+        tr:hover {
+            background: #f9f9f9;
+        }
+        .today {
+            background: #fff3cd !important;
+        }
+        .weekend {
+            color: #ff5722;
+        }
+        .holiday {
+            color: #e91e63;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 13px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            margin-right: 6px;
+        }
+        .controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        button, select {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            -webkit-appearance: none;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            flex: 1;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        #monthSelect {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            flex: 2;
+        }
+        .install-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+        }
+        .install-btn.show {
+            display: block;
+        }
+        .holiday-list {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 13px;
+        }
+        .holiday-list h3 {
+            font-size: 15px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .holiday-tag {
+            display: inline-block;
+            background: #e91e63;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 我的值班表</h1>
+        
+        <div class="card next-shift">
+            <h2>⏰ 下一次值班</h2>
+            <div class="shift-info" id="nextShiftInfo">
+                加载中...
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📋 值班日历</h2>
+            <div class="controls">
+                <select id="monthSelect"></select>
+                <button class="btn-secondary" onclick="showMonth(-1)">◀ 上月</button>
+                <button class="btn-primary" onclick="showToday()">今天</button>
+                <button class="btn-secondary" onclick="showMonth(1)">下月 ▶</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>星期</th>
+                        <th>班次类型</th>
+                        <th>时间</th>
+                    </tr>
+                </thead>
+                <tbody id="calendarBody">
+                </tbody>
+            </table>
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #4CAF50;"></div>
+                    <span>正常班</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff9800;"></div>
+                    <span>值班</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #2196F3;"></div>
+                    <span>周末休息</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #e91e63;"></div>
+                    <span>法定节假日</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ff5722;"></div>
+                    <span>节假日值班</span>
+                </div>
+            </div>
+            <div class="holiday-list" id="holidayList">
+                <h3>📌 2026 年法定节假日</h3>
+                <div id="holidayTags"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="install-btn" id="installBtn" onclick="installApp()">
+        📲 安装到手机
+    </button>
+
+    <script>
+        // 配置
+        const FIRST_DUTY_DATE = new Date(2026, 2, 31); // 2026 年 3 月 31 日
+        const DUTY_CYCLE = 4; // 每 4 天值班一次
+        
+        // 2026 年中国法定节假日（根据国务院办公厅发布）
+        const HOLIDAYS_2026 = {
+            // 元旦
+            '2026-01-01': '元旦',
+            // 春节
+            '2026-02-17': '春节',
+            '2026-02-18': '春节',
+            '2026-02-19': '春节',
+            '2026-02-20': '春节',
+            '2026-02-21': '春节',
+            '2026-02-22': '春节',
+            '2026-02-23': '春节',
+            // 清明节
+            '2026-04-05': '清明节',
+            '2026-04-06': '清明节',
+            '2026-04-07': '清明节',
+            // 劳动节
+            '2026-05-01': '劳动节',
+            '2026-05-02': '劳动节',
+            '2026-05-03': '劳动节',
+            '2026-05-04': '劳动节',
+            '2026-05-05': '劳动节',
+            // 端午节
+            '2026-06-19': '端午节',
+            '2026-06-20': '端午节',
+            '2026-06-21': '端午节',
+            // 中秋节
+            '2026-09-25': '中秋节',
+            '2026-09-26': '中秋节',
+            '2026-09-27': '中秋节',
+            // 国庆节
+            '2026-10-01': '国庆节',
+            '2026-10-02': '国庆节',
+            '2026-10-03': '国庆节',
+            '2026-10-04': '国庆节',
+            '2026-10-05': '国庆节',
+            '2026-10-06': '国庆节',
+            '2026-10-07': '国庆节',
+            '2026-10-08': '国庆节'
+        };
+
+        // 调休上班日（虽然是周末但要上班）
+        const WORK_ON_HOLIDAY_2026 = {
+            '2026-02-15': '春节调休',
+            '2026-02-28': '春节调休',
+            '2026-04-04': '清明调休',
+            '2026-04-26': '劳动节调休',
+            '2026-05-09': '劳动节调休',
+            '2026-06-13': '端午节调休',
+            '2026-09-19': '中秋节调休',
+            '2026-09-27': '国庆节调休',
+            '2026-10-10': '国庆节调休'
+        };
+        
+        let currentDate = new Date();
+        let deferredPrompt = null;
+        
+        // 判断是否是法定节假日
+        function isHoliday(date) {
+            const dateStr = formatDate(date);
+            return HOLIDAYS_2026[dateStr] || null;
+        }
+        
+        // 判断是否是调休上班日
+        function isWorkOnHoliday(date) {
+            const dateStr = formatDate(date);
+            return WORK_ON_HOLIDAY_2026[dateStr] || null;
+        }
+        
+        // 判断是否是值班日
+        function isDutyDay(date) {
+            const diffTime = date.getTime() - FIRST_DUTY_DATE.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays >= 0 && diffDays % DUTY_CYCLE === 0;
+        }
+        
+        // 判断是否是周末
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6;
+        }
+        
+        // 获取班次类型
+        function getShiftType(date) {
+            const holiday = isHoliday(date);
+            const workOnHoliday = isWorkOnHoliday(date);
+            const duty = isDutyDay(date);
+            const weekend = isWeekend(date);
+            
+            // 法定节假日优先
+            if (holiday) {
+                if (duty) {
+                    return { 
+                        type: 'work-on-holiday', 
+                        label: `节假日值班 (${holiday})`, 
+                        class: 'type-work-on-holiday', 
+                        time: '9:00-次日 9:00' 
+                    };
+                } else {
+                    return { 
+                        type: 'holiday', 
+                        label: `${holiday} 休息`, 
+                        class: 'type-holiday', 
+                        time: '-' 
+                    };
+                }
+            }
+            
+            // 调休上班日
+            if (workOnHoliday) {
+                if (duty) {
+                    return { 
+                        type: 'duty', 
+                        label: `值班 (${workOnHoliday})`, 
+                        class: 'type-duty', 
+                        time: '9:00-次日 9:00' 
+                    };
+                } else {
+                    return { 
+                        type: 'normal', 
+                        label: `正常班 (${workOnHoliday})`, 
+                        class: 'type-normal', 
+                        time: '9:00-18:00' 
+                    };
+                }
+            }
+            
+            // 周末值班
+            if (duty && weekend) {
+                return { 
+                    type: 'weekend-duty', 
+                    label: '周末值班', 
+                    class: 'type-duty-weekend', 
+                    time: '9:00-次日 9:00' 
+                };
+            }
+            
+            // 普通值班
+            if (duty) {
+                return { 
+                    type: 'duty', 
+                    label: '值班', 
+                    class: 'type-duty', 
+                    time: '9:00-次日 9:00' 
+                };
+            }
+            
+            // 周末休息
+            if (weekend) {
+                return { 
+                    type: 'weekend', 
+                    label: '休息', 
+                    class: 'type-weekend', 
+                    time: '-' 
+                };
+            }
+            
+            // 正常工作日
+            return { 
+                type: 'normal', 
+                label: '正常班', 
+                class: 'type-normal', 
+                time: '9:00-18:00' 
+            };
+        }
+        
+        // 格式化日期
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // 获取星期
+        function getWeekday(date) {
+            const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            return weekdays[date.getDay()];
+        }
+        
+        // 判断是否是今天
+        function isToday(date) {
+            const today = new Date();
+            return date.toDateString() === today.toDateString();
+        }
+        
+        // 显示下一个月
+        function showMonth(offset) {
+            currentDate.setMonth(currentDate.getMonth() + offset);
+            renderCalendar();
+        }
+        
+        // 显示今天
+        function showToday() {
+            currentDate = new Date();
+            renderCalendar();
+        }
+        
+        // 渲染日历
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            updateMonthSelect(year, month);
+            
+            const tbody = document.getElementById('calendarBody');
+            tbody.innerHTML = '';
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const shift = getShiftType(date);
+                const todayClass = isToday(date) ? 'today' : '';
+                const weekendClass = isWeekend(date) && !shift.type.includes('duty') ? 'weekend' : '';
+                const holidayClass = shift.type === 'holiday' ? 'holiday' : '';
+                
+                const row = document.createElement('tr');
+                row.className = `${todayClass} ${weekendClass} ${holidayClass}`;
+                row.innerHTML = `
+                    <td>${formatDate(date)}</td>
+                    <td>${getWeekday(date)}</td>
+                    <td><span class="shift-type ${shift.class}">${shift.label}</span></td>
+                    <td>${shift.time}</td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            updateNextShift();
+        }
+        
+        // 更新月份选择器
+        function updateMonthSelect(year, month) {
+            const select = document.getElementById('monthSelect');
+            select.innerHTML = '';
+            
+            for (let i = -6; i <= 6; i++) {
+                const date = new Date(year, month + i, 1);
+                const option = document.createElement('option');
+                option.value = date.getMonth();
+                option.textContent = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+                if (i === 0) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            }
+            
+            select.onchange = function() {
+                currentDate.setMonth(parseInt(this.value));
+                renderCalendar();
+            };
+        }
+        
+        // 更新下一次值班信息
+        function updateNextShift() {
+            const today = new Date();
+            let nextDuty = new Date(FIRST_DUTY_DATE);
+            
+            while (nextDuty <= today) {
+                nextDuty.setDate(nextDuty.getDate() + DUTY_CYCLE);
+            }
+            
+            const shift = getShiftType(nextDuty);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            const isTomorrow = nextDuty.toDateString() === tomorrow.toDateString();
+            
+            document.getElementById('nextShiftInfo').innerHTML = `
+                <p><strong>日期：</strong>${formatDate(nextDuty)} (${getWeekday(nextDuty)})</p>
+                <p><strong>类型：</strong><span class="shift-type ${shift.class}">${shift.label}</span></p>
+                <p><strong>时间：</strong>${shift.time}</p>
+                ${isTomorrow ? '<p style="margin-top: 10px; font-weight: bold;">⚠️ 明天就是值班日！</p>' : ''}
+            `;
+        }
+        
+        // 显示法定节假日列表
+        function renderHolidayList() {
+            const container = document.getElementById('holidayTags');
+            const holidays = Object.entries(HOLIDAYS_2026);
+            const displayed = new Set();
+            
+            holidays.forEach(([date, name]) => {
+                if (!displayed.has(name)) {
+                    displayed.add(name);
+                    const tag = document.createElement('span');
+                    tag.className = 'holiday-tag';
+                    tag.textContent = name;
+                    container.appendChild(tag);
+                }
+            });
+        }
+        
+        // PWA 安装按钮
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBtn').classList.add('show');
+        });
+        
+        async function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    document.getElementById('installBtn').classList.remove('show');
+                }
+                deferredPrompt = null;
+            }
+        }
+        
+        // 初始化
+        renderCalendar();
+        renderHolidayList();
+    </script>
+</body>
+</html>
