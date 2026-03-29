@@ -17,14 +17,10 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Enable Gradle Wrapper
+    - name: Build APK
       run: |
         chmod +x gradlew
-        ./gradlew --version
-
-    - name: Build Debug APK
-      run: |
-        /gradlew assembleDebug --gd --nm-daemon
+        ./gradlew assembleDebug --nm --nm-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
