@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:root="http://schemas.android.com/apk/res/android">
+    <style name="Theme.DutySchedule" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#667eea</item>
+        <item name="colorPrimaryVariant">#764ba2</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="android:statusBarColor">#667eea</item>
+    </style>
+</resources>
